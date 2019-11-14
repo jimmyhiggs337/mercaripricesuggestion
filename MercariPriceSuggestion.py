@@ -12,6 +12,7 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.preprocessing import LabelBinarizer
 # Ridge - Reduces multicollinearity in regression. Applies L2 Regularization
 from sklearn.linear_model import Ridge
+import Normailizer
 
 #________________________Import Data________________________
 train = pd.read_csv('train.tsv', sep = '\t')
