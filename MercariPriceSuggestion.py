@@ -23,33 +23,33 @@ train_size = len(train)
 #combined_ML = combined.sample(frac=0.1).reset_index(drop=True)
 
 
+#________________________Ridge Recression Function____________________
+#calculates error of MLA
+def rmsle(y, y1):
+    assert len(y) == len(y1)
+    return np.sqrt(np.mean(np.power(np.log1p(y)-np.log1p(y1), 2)))
 
 #________________________Count Vectorizer___________________
 # Count Vectorizer - counts word frequencies 
 cv = CountVectorizer()
-X_category = cv.fit_transform(combined['category_name'])
+catName = cv.fit_transform(combined['category_name'])
 #X_sub1 = cv.fit_transform(combined['sub_category_1'])
 #X_sub2 = cv.fit_transform(combined['sub_category_2'])
 #X_category
 cv = CountVectorizer(min_df=10)
-X_name = cv.fit_transform(combined['name'])
+name = cv.fit_transform(combined['name'])
 
 
 
 #________________________TFIDF Vectorizer___________________
 # TFIDF - More importance/weights on "rare" words. Less importance/weights on "frequent" words
 tv = TfidfVectorizer(max_features=55000, ngram_range=(1, 2), stop_words='english')
-X_description = tv.fit_transform(combined['item_description'])
+itemDesc = tv.fit_transform(combined['item_description'])
 
 
 
 #________________________Label Binarizer____________________
 # Label Binarizer - Converts labels into numerical representation "a,b,c" -> [1,2,3]
 lb = LabelBinarizer(sparse_output=True)
-X_brand = lb.fit_transform(combined['brand_name'])
+brand = lb.fit_transform(combined['brand_name'])
 
-#________________________Ridge Recression Function____________________
-#calculates error of MLA
-def rmsle(y, y1):
-    assert len(y) == len(y1)
-    return np.sqrt(np.mean(np.power(np.log1p(y)-np.log1p(y1), 2)))
