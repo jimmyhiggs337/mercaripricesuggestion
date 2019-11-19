@@ -70,14 +70,16 @@ combined.item_description = combined['item_description'].apply(Normalizer.toLowe
 
 #________________________Count Vectorizer___________________
 # Count Vectorizer - counts word frequencies 
+
+#apply count vectorizer to category name
 cv = CountVectorizer()
 catName = cv.fit_transform(combined['category_name'])
-#subCat1 = cv.fit_transform(combined['sub_category_1'])
-#subCat2 = cv.fit_transform(combined['sub_category_2'])
-#X_category
+catName
+
+#apply count vectorizer to product name
 cv = CountVectorizer(min_df=10)
 name = cv.fit_transform(combined['name'])
-
+name
 
 
 #________________________TFIDF Vectorizer___________________
