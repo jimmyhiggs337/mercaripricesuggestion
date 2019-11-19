@@ -77,7 +77,7 @@ catName = cv.fit_transform(combined['category_name'])
 catName
 
 #apply count vectorizer to product name
-cv = CountVectorizer(min_df=10)
+cv = CountVectorizer(min_df=10) #ignores words that occur less than 10 times
 name = cv.fit_transform(combined['name'])
 name
 
@@ -88,10 +88,11 @@ tv = TfidfVectorizer(max_features=55000, ngram_range=(1, 2), stop_words='english
 itemDesc = tv.fit_transform(combined['item_description'])
 
 
-
 #________________________Label Binarizer____________________
-# Label Binarizer - Converts labels into numerical representation "a,b,c" -> [1,2,3]
-lb = LabelBinarizer(sparse_output=True)
+# Label Binarizer - Converts labels into numerical valus "a,b,c" -> [1,2,3]
+
+#apply label binarizer to brand name
+lb = LabelBinarizer(sparse_output=True) #returns array in sparse CSR format, allows fast row access
 brand = lb.fit_transform(combined['brand_name'])
 
 #*******************   Stop Main    ******************************************
