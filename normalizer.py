@@ -4,12 +4,7 @@ Created on Tue Nov  5 02:27:22 2019
 
 @author: ulgym
 """
-# importing libraries
-#import pandas as pd
-from nltk.corpus import stopwords
-#from nltk.tokenize import word_tokenize 
-import string
-
+from imports import *
 set(stopwords.words('english'))
 stopWords = stopwords.words('english')
 

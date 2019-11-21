@@ -1,32 +1,19 @@
-# -*- coding: utf-8 -*-
-#*******************Imports**********************************************
-import pandas as pd
-import numpy as np
-#import matplotlib.pyplot as plt
-#import seaborn as sns
-import gc
-import lightgbm as lgb
-# CountVectorizer - counts word frequencies 
-# TFIDF - More importance/weights on "rare" words. Less importance/weights on "frequent" words
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
-# LabelBinarizer - Converts labels into numerical representation "a,b,c" -> [1,2,3]
-from sklearn.preprocessing import LabelBinarizer
-# Ridge - Reduces multicollinearity in regression. Applies L2 Regularization
-from sklearn.linear_model import Ridge
+#*******************Imports***************************************************
 import Normalizer
+from imports import *
+
 #*******************Stop Imports**********************************************
 
 
 
-
-
 #*******************Functions*************************************************
-
+"""
 #________________________Ridge Recression Function____________________
 #calculates error of MLA
 def rmsle(y, y1):
     assert len(y) == len(y1)
-    return np.sqrt(np.mean(np.power(np.log1p(y)-np.log1p(y1), 2)))
+    return i.np.sqrt(i.np.mean(i.np.power(i.np.log1p(y)-i.np.log1p(y1), 2)))
+"""
 
 #***********************Stop Functions****************************************
     
@@ -40,8 +27,8 @@ def rmsle(y, y1):
 #________________________Import Data________________________
 train = pd.read_csv('train.tsv', sep = '\t')
 train.head()
-test = pd.read_csv('test.tsv', sep = '\t',engine = 'python')
-combined = pd.concat([train,test])
+test = i.pd.read_csv('test.tsv', sep = '\t',engine = 'python')
+combined = i.pd.concat([train,test])
 submission = test[['test_id']]
 trainSize = len(train)
 
@@ -72,19 +59,19 @@ combined.item_description = combined['item_description'].apply(Normalizer.toLowe
 # Count Vectorizer - counts word frequencies 
 
 #apply count vectorizer to category name
-cv = CountVectorizer()
+cv = i.CountVectorizer()
 catName = cv.fit_transform(combined['category_name'])
 catName
 
 #apply count vectorizer to product name
-cv = CountVectorizer(min_df=10) #ignores words that occur less than 10 times
+cv = i.CountVectorizer(min_df=10) #ignores words that occur less than 10 times
 name = cv.fit_transform(combined['name'])
 name
 
 
 #________________________TFIDF Vectorizer___________________
-# TFIDF - More importance/weights on "rare" words. Less importance/weights on "frequent" words
-tv = TfidfVectorizer(max_features=55000, ngram_range=(1, 2), stop_words='english')
+# TFIDF - More weight(importance) on "rare" words. Less weight(importance) on common words
+tv = i.TfidfVectorizer(max_features=55000, ngram_range=(1, 2), stop_words='english')#builds a vocabylary of the top 55000 features (words), and limits the ngram to a unigram or a bigram 
 itemDesc = tv.fit_transform(combined['item_description'])
 
 
@@ -92,7 +79,7 @@ itemDesc = tv.fit_transform(combined['item_description'])
 # Label Binarizer - Converts labels into numerical valus "a,b,c" -> [1,2,3]
 
 #apply label binarizer to brand name
-lb = LabelBinarizer(sparse_output=True) #returns array in sparse CSR format, allows fast row access
+lb = i.LabelBinarizer(sparse_output=True) #returns array in sparse CSR format, allows fast row access
 brand = lb.fit_transform(combined['brand_name'])
 
 #*******************   Stop Main    ******************************************
