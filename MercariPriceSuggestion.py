@@ -1,7 +1,6 @@
 #*******************Imports***************************************************
-import Normalizer
+from normalizer import Normalizer
 from imports import *
-
 #*******************Stop Imports**********************************************
 
 
@@ -27,8 +26,8 @@ def rmsle(y, y1):
 #________________________Import Data________________________
 train = pd.read_csv('train.tsv', sep = '\t')
 train.head()
-test = i.pd.read_csv('test.tsv', sep = '\t',engine = 'python')
-combined = i.pd.concat([train,test])
+test = pd.read_csv('test.tsv', sep = '\t',engine = 'python')
+combined = pd.concat([train,test])
 submission = test[['test_id']]
 trainSize = len(train)
 
@@ -59,19 +58,19 @@ combined.item_description = combined['item_description'].apply(Normalizer.toLowe
 # Count Vectorizer - counts word frequencies 
 
 #apply count vectorizer to category name
-cv = i.CountVectorizer()
+cv = CountVectorizer()
 catName = cv.fit_transform(combined['category_name'])
 catName
 
 #apply count vectorizer to product name
-cv = i.CountVectorizer(min_df=10) #ignores words that occur less than 10 times
+cv = CountVectorizer(min_df=10) #ignores words that occur less than 10 times
 name = cv.fit_transform(combined['name'])
 name
 
 
 #________________________TFIDF Vectorizer___________________
 # TFIDF - More weight(importance) on "rare" words. Less weight(importance) on common words
-tv = i.TfidfVectorizer(max_features=55000, ngram_range=(1, 2), stop_words='english')#builds a vocabylary of the top 55000 features (words), and limits the ngram to a unigram or a bigram 
+tv = TfidfVectorizer(max_features=55000, ngram_range=(1, 2), stop_words='english')#builds a vocabylary of the top 55000 features (words), and limits the ngram to a unigram or a bigram 
 itemDesc = tv.fit_transform(combined['item_description'])
 
 
@@ -79,7 +78,7 @@ itemDesc = tv.fit_transform(combined['item_description'])
 # Label Binarizer - Converts labels into numerical valus "a,b,c" -> [1,2,3]
 
 #apply label binarizer to brand name
-lb = i.LabelBinarizer(sparse_output=True) #returns array in sparse CSR format, allows fast row access
+lb = LabelBinarizer(sparse_output=True) #returns array in sparse CSR format, allows fast row access
 brand = lb.fit_transform(combined['brand_name'])
 
 #*******************   Stop Main    ******************************************
