@@ -1,4 +1,4 @@
-cd C:\Users\monke\Desktop\Mecrari Price Suggestion			changes to that folder
+cd (filepath of project)			changes to that folder
 git pull https://github.com/jimmyhiggs337/mercaripricesuggestion	downloads files
 git add <filename> 							adds files
 git commit -m "add summary"						master branch
