@@ -6,13 +6,11 @@ from imports import *
 
 
 #*******************Functions*************************************************
-"""
 #________________________Ridge Recression Function____________________
 #calculates error of MLA
 def rmsle(y, y1):
     assert len(y) == len(y1)
     return i.np.sqrt(i.np.mean(i.np.power(i.np.log1p(y)-i.np.log1p(y1), 2)))
-"""
 
 #***********************Stop Functions****************************************
     
@@ -30,6 +28,8 @@ test = pd.read_csv('test.tsv', sep = '\t',engine = 'python')
 combined = pd.concat([train,test])
 submission = test[['test_id']]
 trainSize = len(train)
+trainSparse= sparse_merge[:trainSize]
+testSparse= sparse_merge[trainSize:]
 
 #________________________Data Normailization________________________
 
@@ -59,8 +59,8 @@ combined.item_description = combined['item_description'].apply(Normalizer.toLowe
 
 #apply count vectorizer to category name
 cv = CountVectorizer()
-catName = cv.fit_transform(combined['category_name'])
-catName
+catVar = cv.fit_transform(combined['category_name'])
+catVar
 
 #apply count vectorizer to product name
 cv = CountVectorizer(min_df=10) #ignores words that occur less than 10 times
@@ -80,6 +80,14 @@ itemDesc = tv.fit_transform(combined['item_description'])
 #apply label binarizer to brand name
 lb = LabelBinarizer(sparse_output=True) #returns array in sparse CSR format, allows fast row access
 brand = lb.fit_transform(combined['brand_name'])
+
+#________________________Create CSR Matrix____________________
+# Create our final sparse matrix
+dummyVar = csr_matrix(pd.get_dummies(combined[['item_condition_id', 'shipping']], sparse=True).values) #turnes values of item_condtion_id from a word to a value 1-3 and shippting from a word to a value of 1 or 0 aka "dummy values"
+
+# Combine everything together
+sparseMerge = hstack((dummyVar, itemDesc , brand, catVar, name)).tocsr() #creates CSR matrix (multidimensional array) of simplified dataset variables
+
 
 #*******************   Stop Main    ******************************************
 
