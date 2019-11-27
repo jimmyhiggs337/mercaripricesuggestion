@@ -28,8 +28,7 @@ test = pd.read_csv('test.tsv', sep = '\t',engine = 'python')
 combined = pd.concat([train,test])
 submission = test[['test_id']]
 trainSize = len(train)
-trainSparse= sparse_merge[:trainSize]
-testSparse= sparse_merge[trainSize:]
+
 
 #________________________Data Normailization________________________
 
@@ -87,7 +86,12 @@ dummyVar = csr_matrix(pd.get_dummies(combined[['item_condition_id', 'shipping']]
 
 # Combine everything together
 sparseMerge = hstack((dummyVar, itemDesc , brand, catVar, name)).tocsr() #creates CSR matrix (multidimensional array) of simplified dataset variables
-
+trainSparse= sparseMerge[:trainSize] #creates a csr matrix for the train data seperate from the test data
+testSparse= sparseMerge[trainSize:] #creates a csr matrix for the test data seperate from the train data
+#________________________Preform KFold____________________
+kf = KFold(len(y), round(1 / .10))
+XTrain, yTrain = X_train_sparse[train_indicies], y[train_indicies]
+X_valid, y_valid = X_train_sparse[valid_indicies], y[valid_indicies]
 
 #*******************   Stop Main    ******************************************
 
