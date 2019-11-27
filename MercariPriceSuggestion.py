@@ -6,11 +6,11 @@ from imports import *
 
 
 #*******************Functions*************************************************
-#________________________Ridge Recression Function____________________
+#________________________RMLSE Function____________________
 #calculates error of MLA
 def rmsle(y, y1):
     assert len(y) == len(y1)
-    return i.np.sqrt(i.np.mean(i.np.power(i.np.log1p(y)-i.np.log1p(y1), 2)))
+    return np.sqrt(np.mean(np.power(np.log1p(y)-np.log1p(y1), 2)))
 
 #***********************Stop Functions****************************************
     
@@ -37,6 +37,12 @@ Normalizer.missingValues(combined,'brand_name', 'None')
 Normalizer.missingValues(combined,'item_description', 'None')
 Normalizer.missingValues(combined,'category_name', 'missing')
 
+#force brand_name, category_name, and item_conditon_id value types to be "catergory"
+combined['brand_name'] = combined['brand_name'].astype('category') 
+combined['category_name'] = combined['category_name'].astype('category')
+combined['item_condition_id'] = combined['item_condition_id'].astype('category')
+
+#force item_descpritom value type to be "string"
 combined.item_description = combined.item_description.astype(str)
 
 #removing punctuation from item description
@@ -85,13 +91,22 @@ brand = lb.fit_transform(combined['brand_name'])
 dummyVar = csr_matrix(pd.get_dummies(combined[['item_condition_id', 'shipping']], sparse=True).values) #turnes values of item_condtion_id from a word to a value 1-3 and shippting from a word to a value of 1 or 0 aka "dummy values"
 
 # Combine everything together
+
 sparseMerge = hstack((dummyVar, itemDesc , brand, catVar, name)).tocsr() #creates CSR matrix (multidimensional array) of simplified dataset variables
 trainSparse= sparseMerge[:trainSize] #creates a csr matrix for the train data seperate from the test data
 testSparse= sparseMerge[trainSize:] #creates a csr matrix for the test data seperate from the train data
-#________________________Preform KFold____________________
-kf = KFold(len(y), round(1 / .10))
-XTrain, yTrain = X_train_sparse[train_indicies], y[train_indicies]
-X_valid, y_valid = X_train_sparse[valid_indicies], y[valid_indicies]
+
+#________________________Preform KFold____________________\
+
+y = np.log1p(train['price']) #y = natural log of train price variable (used here as the total number of elements)
+kf = KFold(len(y), 10) # creates kfold that will "fold" the data 10 times (splits data into 10 parts)
+
+#make iterator object out of Kfold (steps through each fold, sampling data), next returns each item
+trainIndicies, validIndicies = next(iter(kf))
+
+#trainSparse used in spliting of train and test data 
+XTrain, yTrain = trainSparse[trainIndicies], y[trainIndicies]
+XValid, yValid = trainSparse[validIndicies], y[validIndicies]
 
 #*******************   Stop Main    ******************************************
 
