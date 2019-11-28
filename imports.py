@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #*******************Imports**********************************************
+import time #counts runtime of program
 import pandas as pd #library used to import and read data
 import numpy as np #library used to import and read data
 #import matplotlib.pyplot as plt
@@ -15,6 +16,7 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.preprocessing import LabelBinarizer # LabelBinarizer - Converts labels into numerical representation "a,b,c" -> [1,2,3]
 from sklearn.linear_model import Ridge # Ridge - Reduces multicollinearity in regression. Applies L2 Regularization
 from nltk.corpus import stopwords #list of stopwords for normalization
-from sklearn.cross_validation import KFold #randomly samples data to check accuracy of data
+from sklearn.model_selection import KFold #randomly samples data to check accuracy of data
+from sklearn.linear_model import Ridge # Ridge - Reduces multicollinearity in regression. Applies L2 Regularization
 import string #python string class
 #*******************Stop Imports**********************************************

@@ -16,17 +16,13 @@ def rmsle(y, y1):
     
 
 
-
-
-
 #*******************   Main    ************************************************
 
 #________________________Import Data________________________
-train = pd.read_csv('train.tsv', sep = '\t')
+train = pd.read_csv('train short.tsv', sep = '\t')
 train.head()
-test = pd.read_csv('test.tsv', sep = '\t',engine = 'python')
+test = pd.read_csv('test short.tsv', sep = '\t',engine = 'python')
 combined = pd.concat([train,test])
-submission = test[['test_id']]
 trainSize = len(train)
 
 
@@ -42,7 +38,8 @@ combined['brand_name'] = combined['brand_name'].astype('category')
 combined['category_name'] = combined['category_name'].astype('category')
 combined['item_condition_id'] = combined['item_condition_id'].astype('category')
 
-#force item_descpritom value type to be "string"
+#force shipping and item_descpritom value types to be "string"
+combined.shipping = combined['shipping'].astype(str)
 combined.item_description = combined.item_description.astype(str)
 
 #removing punctuation from item description
@@ -68,7 +65,7 @@ catVar = cv.fit_transform(combined['category_name'])
 catVar
 
 #apply count vectorizer to product name
-cv = CountVectorizer(min_df=10) #ignores words that occur less than 10 times
+cv = CountVectorizer(min_df=1) #ignores words that occur less than 10 times
 name = cv.fit_transform(combined['name'])
 name
 
@@ -88,6 +85,7 @@ brand = lb.fit_transform(combined['brand_name'])
 
 #________________________Create CSR Matrix____________________
 # Create our final sparse matrix
+
 dummyVar = csr_matrix(pd.get_dummies(combined[['item_condition_id', 'shipping']], sparse=True).values) #turnes values of item_condtion_id from a word to a value 1-3 and shippting from a word to a value of 1 or 0 aka "dummy values"
 
 # Combine everything together
@@ -96,18 +94,39 @@ sparseMerge = hstack((dummyVar, itemDesc , brand, catVar, name)).tocsr() #create
 trainSparse= sparseMerge[:trainSize] #creates a csr matrix for the train data seperate from the test data
 testSparse= sparseMerge[trainSize:] #creates a csr matrix for the test data seperate from the train data
 
-#________________________Preform KFold____________________\
+#________________________Preform KFold__________________________
 
 y = np.log1p(train['price']) #y = natural log of train price variable (used here as the total number of elements)
-kf = KFold(len(y), 10) # creates kfold that will "fold" the data 10 times (splits data into 10 parts)
+kf = KFold(n_splits=10) # creates kfold that will "fold" the data 10 times (splits data into 10 parts)
 
 #make iterator object out of Kfold (steps through each fold, sampling data), next returns each item
-trainIndicies, validIndicies = next(iter(kf))
+trainIndicies, validIndicies = next(iter(kf.split(trainSparse)))
 
 #trainSparse used in spliting of train and test data 
-XTrain, yTrain = trainSparse[trainIndicies], y[trainIndicies]
-XValid, yValid = trainSparse[validIndicies], y[validIndicies]
+xTrain, yTrain = trainSparse[trainIndicies], y[trainIndicies]
+xValid, yValid = trainSparse[validIndicies], y[validIndicies]
 
+#________________________Preform Ridge Regression___________________
+
+startTime = time.time()
+
+model = Ridge(solver = "sag", fit_intercept=False)
+
+print("Fitting Ridge Model")
+model.fit(xTrain, yTrain)
+
+predsValid = model.predict(xValid)
+
+print('[{}] Ridge completed.'.format(time.time() - startTime))
+print("Ridge rmsle: "+str(rmsle(np.expm1(yValid), np.expm1(predsValid))))
+
+#________________________Apply Prediction to test set___________________
+# Predicting prices on testSet
+preds = model.predict(testSparse)
+submission = test[['test_id']]#adding number label to submission dataframe
+submission['name']= test['name']#adding item name to submission dataframe
+submission["price"] = np.expm1(preds) #adding predictied price to submission dataframe
+submission.to_csv("price_suggestion.csv", index = False) #putting submission datafraime into submission file
 #*******************   Stop Main    ******************************************
 
 
