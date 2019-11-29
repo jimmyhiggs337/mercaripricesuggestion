@@ -19,9 +19,9 @@ def rmsle(y, y1):
 #*******************   Main    ************************************************
 
 #________________________Import Data________________________
-train = pd.read_csv('train short.tsv', sep = '\t')
+train = pd.read_csv('train.tsv', sep = '\t')
 train.head()
-test = pd.read_csv('test short.tsv', sep = '\t',engine = 'python')
+test = pd.read_csv('test.tsv', sep = '\t',engine = 'python')
 combined = pd.concat([train,test])
 trainSize = len(train)
 
@@ -65,7 +65,7 @@ catVar = cv.fit_transform(combined['category_name'])
 catVar
 
 #apply count vectorizer to product name
-cv = CountVectorizer(min_df=1) #ignores words that occur less than 10 times
+cv = CountVectorizer(min_df=10) #ignores words that occur less than 10 times
 name = cv.fit_transform(combined['name'])
 name
 
